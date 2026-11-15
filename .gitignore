@@ -1,0 +1,8 @@
+# salidas de las pruebas y datos del n8n de pruebas: no se guardan
+herramientas/pruebas/
+herramientas/n8n-demo/
+herramientas/capturas*/
+herramientas/edge-perfil/
+herramientas/zip-comprobado-*/
+_revision/
+*.zip

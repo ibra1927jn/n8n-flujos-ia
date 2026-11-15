@@ -1,0 +1,265 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Academia Lumen · Contacto</title>
+<style>
+  :root {
+    --azul: #1e3a8a; --azul-claro: #eef2ff; --tinta: #111827; --texto: #374151; --suave: #6b7280;
+    --borde: #e5e7eb; --fondo: #f6f7fb; --blanco: #ffffff; --ambar: #b45309; --ambar-bg: #fffbeb;
+    --verde: #047857; --verde-bg: #ecfdf5; --rojo: #b91c1c; --rojo-bg: #fef2f2;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; color: var(--texto); background: var(--fondo); line-height: 1.55; }
+  header { background: var(--blanco); border-bottom: 1px solid var(--borde); }
+  .barra { max-width: 1080px; margin: 0 auto; padding: 14px 20px; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+  .marca { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 18px; color: var(--azul); }
+  .marca span { width: 30px; height: 30px; border-radius: 8px; background: var(--azul); color: #fff; display: grid; place-items: center; font-size: 16px; }
+  .barra small { color: var(--suave); font-size: 13px; }
+  main { max-width: 1080px; margin: 0 auto; padding: 36px 20px 24px; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 40px; align-items: start; }
+  h1 { font-size: 34px; line-height: 1.15; color: var(--tinta); margin: 0 0 14px; letter-spacing: -0.02em; }
+  .entrada { font-size: 17px; margin: 0 0 24px; max-width: 46ch; }
+  .cursos { list-style: none; margin: 0 0 24px; padding: 0; display: grid; gap: 8px; }
+  .cursos li { background: var(--blanco); border: 1px solid var(--borde); border-radius: 10px; padding: 10px 14px; display: flex; justify-content: space-between; gap: 12px; font-size: 14px; }
+  .cursos b { color: var(--tinta); font-weight: 600; }
+  .cursos span { color: var(--suave); white-space: nowrap; }
+  .datos { font-size: 14px; color: var(--suave); margin: 0; }
+  .tarjeta { background: var(--blanco); border: 1px solid var(--borde); border-radius: 16px; padding: 28px; }
+  h2 { font-size: 22px; color: var(--tinta); margin: 0 0 4px; }
+  .sub { margin: 0 0 18px; font-size: 14px; color: var(--suave); }
+  .ejemplos { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 0 0 18px; padding: 10px 12px; background: var(--azul-claro); border-radius: 10px; font-size: 13px; color: var(--azul); }
+  .ejemplos button { font: inherit; font-size: 13px; border: 1px solid #c7d2fe; background: var(--blanco); color: var(--azul); border-radius: 999px; padding: 4px 12px; cursor: pointer; }
+  .ejemplos button:hover { background: #e0e7ff; }
+  label { display: block; font-size: 14px; font-weight: 600; color: var(--tinta); margin: 0 0 6px; }
+  .campo { margin: 0 0 14px; }
+  .dos { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  input, select, textarea { width: 100%; font: inherit; font-size: 15px; color: var(--tinta); background: var(--blanco); border: 1px solid #d1d5db; border-radius: 10px; padding: 10px 12px; }
+  textarea { min-height: 120px; resize: vertical; }
+  input:focus, select:focus, textarea:focus, button:focus-visible, summary:focus-visible { outline: 2px solid var(--azul); outline-offset: 2px; }
+  .enviar { width: 100%; font: inherit; font-size: 16px; font-weight: 600; color: #fff; background: var(--azul); border: 0; border-radius: 10px; padding: 12px 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; }
+  .enviar:hover { background: #1b337a; }
+  .enviar[disabled] { opacity: .75; cursor: progress; }
+  .rueda { width: 16px; height: 16px; border: 2px solid rgba(255,255,255,.45); border-top-color: #fff; border-radius: 50%; animation: gira .8s linear infinite; }
+  @keyframes gira { to { transform: rotate(360deg); } }
+  .aviso { margin: 14px 0 0; padding: 12px 14px; border-radius: 10px; font-size: 14px; background: var(--rojo-bg); color: var(--rojo); border: 1px solid #fecaca; }
+  .exito h2 { margin-bottom: 8px; }
+  .exito .ok { width: 44px; height: 44px; border-radius: 50%; background: var(--verde-bg); color: var(--verde); display: grid; place-items: center; font-size: 24px; margin: 0 0 14px; }
+  .ia { margin: 20px 0; padding: 14px 16px; border: 1px dashed #c7d2fe; border-radius: 12px; background: #fafaff; }
+  .ia h3 { margin: 0 0 10px; font-size: 13px; text-transform: none; color: var(--azul); font-weight: 600; }
+  .ia dl { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 6px 14px; font-size: 14px; }
+  .ia dt { color: var(--suave); }
+  .ia dd { margin: 0; color: var(--tinta); font-weight: 600; }
+  .reserva { margin: 20px 0; padding: 12px 14px; border-radius: 12px; font-size: 14px; background: var(--ambar-bg); color: var(--ambar); border: 1px solid #fde68a; }
+  .pill { display: inline-block; padding: 1px 10px; border-radius: 999px; font-size: 13px; }
+  .pill.normal { background: var(--verde-bg); color: var(--verde); }
+  .pill.alta { background: var(--rojo-bg); color: var(--rojo); }
+  .correo { margin: 0 0 20px; border: 1px solid var(--borde); border-radius: 12px; overflow: hidden; }
+  .correo-cab { margin: 0; padding: 9px 16px; background: var(--azul); color: #fff; font-size: 13px; font-weight: 600; }
+  .correo-asunto { margin: 0; padding: 12px 16px 0; font-size: 15px; font-weight: 700; color: var(--tinta); }
+  .correo-texto { margin: 0; padding: 8px 16px 14px; font-size: 14px; white-space: pre-line; }
+  .otra { font: inherit; font-size: 15px; font-weight: 600; color: var(--azul); background: var(--blanco); border: 1px solid #c7d2fe; border-radius: 10px; padding: 10px 16px; cursor: pointer; }
+  footer { max-width: 1080px; margin: 0 auto; padding: 8px 20px 40px; font-size: 13px; color: var(--suave); }
+  details { margin-top: 10px; background: var(--blanco); border: 1px solid var(--borde); border-radius: 12px; padding: 10px 14px; }
+  summary { cursor: pointer; font-weight: 600; color: var(--texto); }
+  .conexion { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px; align-items: end; margin-top: 12px; }
+  .conexion label { font-size: 13px; }
+  .conexion input, .conexion select { font-size: 14px; padding: 8px 10px; }
+  .url { margin: 10px 0 2px; font-family: ui-monospace, Consolas, monospace; font-size: 12.5px; color: var(--tinta); word-break: break-all; }
+  [hidden] { display: none !important; }
+  @media (max-width: 860px) { main { grid-template-columns: minmax(0, 1fr); gap: 28px; padding-top: 24px; } h1 { font-size: 28px; } .dos { grid-template-columns: 1fr; } .conexion { grid-template-columns: minmax(0, 1fr); } }
+</style>
+</head>
+<body>
+<header>
+  <div class="barra">
+    <div class="marca"><span aria-hidden="true">L</span>Academia Lumen</div>
+    <small>Calle Mayor 12, Madrid · 910 000 000</small>
+  </div>
+</header>
+
+<main>
+  <section>
+    <h1>Formación práctica para tu siguiente paso profesional</h1>
+    <p class="entrada">Cursos cortos, en grupos pequeños, presenciales u online en directo. Cuéntanos qué necesitas y te respondemos por correo en menos de un minuto.</p>
+    <ul class="cursos">
+      <li><b>Inteligencia artificial para el trabajo</b><span>8 semanas · 290 €</span></li>
+      <li><b>Excel y análisis de datos</b><span>6 semanas · 190 €</span></li>
+      <li><b>Inglés profesional (B2)</b><span>Trimestral · 85 €/mes</span></li>
+      <li><b>Marketing digital y redes sociales</b><span>10 semanas · 320 €</span></li>
+      <li><b>Ofimática básica</b><span>4 semanas · 120 €</span></li>
+    </ul>
+    <p class="datos">Secretaría: de lunes a viernes, de 9:00 a 14:00 y de 16:00 a 20:00.</p>
+  </section>
+
+  <section class="tarjeta" aria-live="polite">
+    <div id="vista-form">
+      <h2>Escríbenos</h2>
+      <p class="sub">Responde nuestra recepcionista virtual, a cualquier hora.</p>
+      <div class="ejemplos">
+        <span>Rellenar con un ejemplo:</span>
+        <button type="button" data-ejemplo="0">Precios</button>
+        <button type="button" data-ejemplo="1">Matrícula</button>
+        <button type="button" data-ejemplo="2">Queja urgente</button>
+      </div>
+      <form id="form" novalidate>
+        <div class="dos">
+          <div class="campo"><label for="nombre">Nombre</label><input id="nombre" name="nombre" autocomplete="name" required></div>
+          <div class="campo"><label for="email">Correo electrónico</label><input id="email" name="email" type="email" autocomplete="email" placeholder="tu-correo@gmail.com" required></div>
+        </div>
+        <div class="campo">
+          <label for="curso">Curso que te interesa</label>
+          <select id="curso" name="curso">
+            <option>Todavía no lo tengo claro</option>
+            <option>Inteligencia artificial para el trabajo</option>
+            <option>Excel y análisis de datos</option>
+            <option>Inglés profesional (B2)</option>
+            <option>Marketing digital y redes sociales</option>
+            <option>Ofimática básica</option>
+          </select>
+        </div>
+        <div class="campo"><label for="mensaje">Tu consulta</label><textarea id="mensaje" name="mensaje" placeholder="¿Cuánto cuesta el curso de Excel y qué días son las clases?" required></textarea></div>
+        <button class="enviar" id="enviar" type="submit">Enviar consulta</button>
+        <p class="aviso" id="aviso" role="alert" hidden></p>
+      </form>
+    </div>
+
+    <div id="vista-exito" class="exito" hidden>
+      <div class="ok" aria-hidden="true">✓</div>
+      <h2 id="ex-titulo"></h2>
+      <p id="ex-texto" style="margin:0"></p>
+      <p class="reserva" id="ex-reserva" hidden>La recepcionista IA no estaba disponible, así que has recibido una respuesta automática. Secretaría ya tiene tu consulta y te contestará en persona.</p>
+      <div class="ia" id="ex-ia">
+        <h3>Así ha gestionado tu consulta la recepcionista IA</h3>
+        <dl>
+          <dt>Categoría</dt><dd id="ex-categoria"></dd>
+          <dt>Urgencia</dt><dd><span class="pill" id="ex-urgencia"></span></dd>
+          <dt>Asunto del correo</dt><dd id="ex-asunto"></dd>
+        </dl>
+      </div>
+      <div class="correo" id="ex-correo" hidden>
+        <p class="correo-cab">Este es el correo que te hemos enviado</p>
+        <p class="correo-asunto" id="ex-correo-asunto"></p>
+        <p class="correo-texto" id="ex-respuesta"></p>
+      </div>
+      <button class="otra" id="otra" type="button">Enviar otra consulta</button>
+    </div>
+  </section>
+</main>
+
+<footer>
+  Página de demostración: Academia Lumen es un negocio inventado para enseñar un flujo de n8n.
+  <details id="ajustes">
+    <summary>Conexión con n8n</summary>
+    <div class="conexion">
+      <div><label for="base">Dirección de n8n</label><input id="base" placeholder="http://localhost:5678" spellcheck="false"></div>
+      <div><label for="modo">Modo</label>
+        <select id="modo">
+          <option value="prueba">Prueba (botón Execute workflow)</option>
+          <option value="publicado">Publicado</option>
+        </select>
+      </div>
+    </div>
+    <p class="url" id="url"></p>
+    <p style="margin:0">En modo prueba, n8n solo escucha una vez cada vez que pulsas «Execute workflow».</p>
+  </details>
+</footer>
+
+<script>
+  const RUTA = 'recepcionista';
+  const CLAVE = 'demo-n8n-conexion';
+  const $ = (id) => document.getElementById(id);
+
+  const leer = () => { try { return JSON.parse(localStorage.getItem(CLAVE)) || {}; } catch (e) { return {}; } };
+  const guardar = () => { try { localStorage.setItem(CLAVE, JSON.stringify(cfg)); } catch (e) {} };
+  const cfg = Object.assign({ base: 'http://localhost:5678', modo: 'prueba', email: '' }, leer());
+  const qs = new URLSearchParams(location.search);
+  if (qs.get('n8n')) cfg.base = qs.get('n8n');
+  if (qs.get('modo')) cfg.modo = qs.get('modo');
+
+  const url = () => cfg.base.trim().replace(/\/+$/, '') + (cfg.modo === 'publicado' ? '/webhook/' : '/webhook-test/') + RUTA;
+  const pintarUrl = () => { $('url').textContent = 'Se enviará a: ' + url(); };
+
+  $('base').value = cfg.base;
+  $('modo').value = cfg.modo;
+  $('email').value = cfg.email || '';
+  pintarUrl();
+  $('base').addEventListener('input', (e) => { cfg.base = e.target.value || 'http://localhost:5678'; guardar(); pintarUrl(); });
+  $('modo').addEventListener('change', (e) => { cfg.modo = e.target.value; guardar(); pintarUrl(); });
+
+  const EJEMPLOS = [
+    { nombre: 'Ana García', curso: 'Excel y análisis de datos', mensaje: 'Hola, me interesa el curso de Excel. ¿Cuánto cuesta y qué días son las clases? Estoy en paro, ¿tengo algún descuento?' },
+    { nombre: 'Carlos Méndez', curso: 'Inteligencia artificial para el trabajo', mensaje: 'Buenas tardes, quiero apuntarme al curso de inteligencia artificial que empieza el mes que viene. ¿Qué tengo que hacer para matricularme? ¿Se puede seguir online?' },
+    { nombre: 'Marta Ruiz', curso: 'Marketing digital y redes sociales', mensaje: 'Me habéis cobrado dos veces la mensualidad del curso de marketing y necesito que me devolváis el dinero cuanto antes. Mañana me pasan el recibo del alquiler.' },
+  ];
+  document.querySelectorAll('[data-ejemplo]').forEach((b) => b.addEventListener('click', () => {
+    const e = EJEMPLOS[Number(b.dataset.ejemplo)];
+    $('nombre').value = e.nombre; $('curso').value = e.curso; $('mensaje').value = e.mensaje;
+    $('aviso').hidden = true;
+    ($('email').value ? $('enviar') : $('email')).focus();
+  }));
+
+  const CATEGORIAS = { informacion_cursos: 'Información de cursos', precios: 'Precios', matricula: 'Matrícula', horarios: 'Horarios', incidencia: 'Incidencia', otros: 'Otros' };
+
+  function ocupado(si) {
+    const b = $('enviar');
+    b.disabled = si;
+    b.textContent = '';
+    if (si) { const r = document.createElement('span'); r.className = 'rueda'; b.append(r, 'La recepcionista está respondiendo…'); }
+    else b.textContent = 'Enviar consulta';
+  }
+
+  function error(texto) { $('aviso').textContent = texto; $('aviso').hidden = false; }
+
+  $('form').addEventListener('submit', async (ev) => {
+    ev.preventDefault();
+    $('aviso').hidden = true;
+    const form = ev.target;
+    if (!form.checkValidity()) { form.reportValidity(); return; }
+    const datos = Object.fromEntries(new FormData(form));
+    cfg.email = datos.email; guardar();
+    ocupado(true);
+    try {
+      const res = await fetch(url(), { method: 'POST', body: new URLSearchParams(datos) });
+      let json = null;
+      try { json = await res.json(); } catch (e) {}
+      if (!res.ok || !json || !json.ok) {
+        error(res.status >= 500
+          ? 'El flujo de n8n se ha detenido con un error. Abre la ejecución en n8n para ver en qué bloque ha fallado.'
+          : 'n8n ha respondido, pero no como se esperaba (código ' + res.status + '). Revisa que el flujo termina en «Confirmar en la web».');
+        return;
+      }
+      $('ex-titulo').textContent = '¡Gracias, ' + (json.nombre || datos.nombre) + '!';
+      $('ex-texto').textContent = 'Hemos enviado la respuesta a ' + (json.email || datos.email) + '. Revisa tu bandeja de entrada.';
+      $('ex-categoria').textContent = CATEGORIAS[json.categoria] || json.categoria || '—';
+      const alta = String(json.urgencia || '').toLowerCase() === 'alta';
+      $('ex-urgencia').textContent = alta ? 'Alta' : 'Normal';
+      $('ex-urgencia').className = 'pill ' + (alta ? 'alta' : 'normal');
+      $('ex-asunto').textContent = json.asunto || '—';
+      // Si la IA ha fallado, el flujo envía una respuesta de reserva: se dice claramente y no se enseña una clasificación que la IA no ha hecho.
+      const reserva = json.respondio_la_ia === false;
+      $('ex-reserva').hidden = !reserva;
+      $('ex-ia').hidden = reserva;
+      // Si el flujo devuelve el texto de la respuesta, se enseña tal como ha salido en el correo.
+      const respuesta = String(json.respuesta || '').trim();
+      $('ex-correo-asunto').textContent = json.asunto || '';
+      $('ex-respuesta').textContent = respuesta;
+      $('ex-correo').hidden = !respuesta;
+      $('vista-form').hidden = true; $('vista-exito').hidden = false;
+      $('otra').focus();
+    } catch (e) {
+      error('No se ha podido conectar con n8n en ' + url() + '. Comprueba que n8n está abierto y que el flujo está escuchando: pulsa «Execute workflow» y vuelve a enviar. Si el flujo está publicado, cambia el modo en «Conexión con n8n».');
+      $('ajustes').open = true;
+    } finally {
+      ocupado(false);
+    }
+  });
+
+  $('otra').addEventListener('click', () => {
+    $('mensaje').value = '';
+    $('vista-exito').hidden = true; $('vista-form').hidden = false;
+    $('nombre').focus();
+  });
+</script>
+</body>
+</html>

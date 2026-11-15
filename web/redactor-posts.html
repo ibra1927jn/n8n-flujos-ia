@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Redactor de posts</title>
+<style>
+  :root {
+    --verde: #0f766e; --verde-osc: #0b5d57; --verde-claro: #f0fdfa; --tinta: #0f172a; --texto: #334155; --suave: #64748b;
+    --borde: #e2e8f0; --fondo: #f8fafc; --blanco: #ffffff; --rojo: #b91c1c; --rojo-bg: #fef2f2;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; color: var(--texto); background: var(--fondo); line-height: 1.55; }
+  main { max-width: 1040px; margin: 0 auto; padding: 40px 20px 24px; }
+  .cabecera { margin: 0 0 28px; }
+  .chapa { display: inline-block; font-size: 13px; font-weight: 600; color: var(--verde); background: var(--verde-claro); border: 1px solid #99f6e4; border-radius: 999px; padding: 3px 12px; margin: 0 0 12px; }
+  h1 { font-size: 34px; line-height: 1.15; letter-spacing: -0.02em; color: var(--tinta); margin: 0 0 10px; }
+  .entrada { font-size: 17px; margin: 0; max-width: 62ch; }
+  .rejilla { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); gap: 24px; align-items: start; }
+  .tarjeta { background: var(--blanco); border: 1px solid var(--borde); border-radius: 16px; padding: 24px; }
+  h2 { font-size: 18px; color: var(--tinta); margin: 0 0 16px; }
+  label { display: block; font-size: 14px; font-weight: 600; color: var(--tinta); margin: 0 0 6px; }
+  .campo { margin: 0 0 14px; }
+  input, select { width: 100%; font: inherit; font-size: 15px; color: var(--tinta); background: var(--blanco); border: 1px solid #cbd5e1; border-radius: 10px; padding: 10px 12px; }
+  input:focus, select:focus, button:focus-visible, summary:focus-visible, a:focus-visible { outline: 2px solid var(--verde); outline-offset: 2px; }
+  .ideas { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0 0; }
+  .ideas button { font: inherit; font-size: 12.5px; color: var(--verde-osc); background: var(--verde-claro); border: 1px solid #99f6e4; border-radius: 999px; padding: 3px 10px; cursor: pointer; }
+  .ideas button:hover { background: #ccfbf1; }
+  .enviar { width: 100%; font: inherit; font-size: 16px; font-weight: 600; color: #fff; background: var(--verde); border: 0; border-radius: 10px; padding: 12px 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 6px; }
+  .enviar:hover { background: var(--verde-osc); }
+  .enviar[disabled] { opacity: .75; cursor: progress; }
+  .rueda { width: 16px; height: 16px; border: 2px solid rgba(255,255,255,.45); border-top-color: #fff; border-radius: 50%; animation: gira .8s linear infinite; }
+  @keyframes gira { to { transform: rotate(360deg); } }
+  .aviso { margin: 14px 0 0; padding: 12px 14px; border-radius: 10px; font-size: 14px; background: var(--rojo-bg); color: var(--rojo); border: 1px solid #fecaca; }
+  .vacio { border: 1px dashed #cbd5e1; border-radius: 12px; padding: 36px 20px; text-align: center; color: var(--suave); font-size: 15px; }
+  .post { border: 1px solid var(--borde); border-radius: 12px; padding: 16px 18px; }
+  .autor { display: flex; align-items: center; gap: 10px; margin: 0 0 12px; }
+  .avatar { width: 40px; height: 40px; border-radius: 50%; background: var(--verde-claro); color: var(--verde); display: grid; place-items: center; font-weight: 700; }
+  .autor b { display: block; color: var(--tinta); font-size: 14.5px; line-height: 1.2; }
+  .autor small { color: var(--suave); font-size: 12.5px; }
+  .texto { white-space: pre-wrap; color: var(--tinta); font-size: 15px; line-height: 1.6; margin: 0; overflow-wrap: anywhere; }
+  .acciones { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin: 14px 0 0; font-size: 13.5px; color: var(--suave); }
+  .copiar { font: inherit; font-size: 14px; font-weight: 600; color: var(--verde-osc); background: var(--blanco); border: 1px solid #99f6e4; border-radius: 10px; padding: 8px 14px; cursor: pointer; }
+  .copiar:hover { background: var(--verde-claro); }
+  h3 { font-size: 14px; color: var(--tinta); margin: 20px 0 8px; }
+  .fuentes { margin: 0; padding-left: 18px; font-size: 13.5px; display: grid; gap: 4px; }
+  .fuentes a { color: var(--verde-osc); overflow-wrap: anywhere; }
+  footer { max-width: 1040px; margin: 0 auto; padding: 8px 20px 40px; font-size: 13px; color: var(--suave); }
+  details { margin-top: 10px; background: var(--blanco); border: 1px solid var(--borde); border-radius: 12px; padding: 10px 14px; }
+  summary { cursor: pointer; font-weight: 600; color: var(--texto); }
+  .conexion { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px; align-items: end; margin-top: 12px; }
+  .conexion label { font-size: 13px; }
+  .conexion input, .conexion select { font-size: 14px; padding: 8px 10px; }
+  .url { margin: 10px 0 2px; font-family: ui-monospace, Consolas, monospace; font-size: 12.5px; color: var(--tinta); word-break: break-all; }
+  [hidden] { display: none !important; }
+  @media (max-width: 860px) { .rejilla { grid-template-columns: minmax(0, 1fr); } h1 { font-size: 28px; } main { padding-top: 24px; } .conexion { grid-template-columns: minmax(0, 1fr); } }
+</style>
+</head>
+<body>
+<main>
+  <div class="cabecera">
+    <p class="chapa">n8n + Gemini + Google Noticias</p>
+    <h1>Redactor de posts para LinkedIn</h1>
+    <p class="entrada">Escribe un tema. El flujo busca titulares de hoy, la IA redacta el post y te lo envía también por correo.</p>
+  </div>
+
+  <div class="rejilla">
+    <section class="tarjeta">
+      <h2>Tu post</h2>
+      <form id="form" novalidate>
+        <div class="campo">
+          <label for="tema">Tema</label>
+          <input id="tema" name="tema" placeholder="Inteligencia artificial en la educación" required>
+          <div class="ideas" aria-label="Ideas de tema">
+            <button type="button">Inteligencia artificial en la educación</button>
+            <button type="button">Teletrabajo y productividad</button>
+            <button type="button">Automatización en pequeñas empresas</button>
+          </div>
+        </div>
+        <div class="campo">
+          <label for="tono">Tono</label>
+          <select id="tono" name="tono">
+            <option>Cercano</option>
+            <option>Profesional</option>
+            <option>Inspirador</option>
+            <option>Divulgativo</option>
+          </select>
+        </div>
+        <div class="campo">
+          <label for="email">Correo donde quieres recibirlo</label>
+          <input id="email" name="email" type="email" autocomplete="email" placeholder="tu-correo@gmail.com" required>
+        </div>
+        <button class="enviar" id="enviar" type="submit">Redactar post</button>
+        <p class="aviso" id="aviso" role="alert" hidden></p>
+      </form>
+    </section>
+
+    <section class="tarjeta" aria-live="polite">
+      <h2>Resultado</h2>
+      <div class="vacio" id="vacio">Aquí aparecerá el post en cuanto la IA lo termine.</div>
+      <div id="resultado" hidden>
+        <div class="post">
+          <div class="autor">
+            <div class="avatar" aria-hidden="true">Tú</div>
+            <div><b>Tu nombre</b><small>Borrador · ahora mismo</small></div>
+          </div>
+          <p class="texto" id="texto"></p>
+        </div>
+        <div class="acciones">
+          <span id="enviado"></span>
+          <button class="copiar" id="copiar" type="button">Copiar post</button>
+        </div>
+        <div id="bloque-fuentes">
+          <h3>Titulares en los que se ha apoyado</h3>
+          <ol class="fuentes" id="fuentes"></ol>
+        </div>
+      </div>
+    </section>
+  </div>
+</main>
+
+<footer>
+  Página de demostración de un flujo de n8n.
+  <details id="ajustes">
+    <summary>Conexión con n8n</summary>
+    <div class="conexion">
+      <div><label for="base">Dirección de n8n</label><input id="base" placeholder="http://localhost:5678" spellcheck="false"></div>
+      <div><label for="modo">Modo</label>
+        <select id="modo">
+          <option value="prueba">Prueba (botón Execute workflow)</option>
+          <option value="publicado">Publicado</option>
+        </select>
+      </div>
+    </div>
+    <p class="url" id="url"></p>
+    <p style="margin:0">En modo prueba, n8n solo escucha una vez cada vez que pulsas «Execute workflow».</p>
+  </details>
+</footer>
+
+<script>
+  const RUTA = 'redactor-posts';
+  const CLAVE = 'demo-n8n-conexion';
+  const $ = (id) => document.getElementById(id);
+
+  const leer = () => { try { return JSON.parse(localStorage.getItem(CLAVE)) || {}; } catch (e) { return {}; } };
+  const guardar = () => { try { localStorage.setItem(CLAVE, JSON.stringify(cfg)); } catch (e) {} };
+  const cfg = Object.assign({ base: 'http://localhost:5678', modo: 'prueba', email: '' }, leer());
+  const qs = new URLSearchParams(location.search);
+  if (qs.get('n8n')) cfg.base = qs.get('n8n');
+  if (qs.get('modo')) cfg.modo = qs.get('modo');
+
+  const url = () => cfg.base.trim().replace(/\/+$/, '') + (cfg.modo === 'publicado' ? '/webhook/' : '/webhook-test/') + RUTA;
+  const pintarUrl = () => { $('url').textContent = 'Se enviará a: ' + url(); };
+
+  $('base').value = cfg.base;
+  $('modo').value = cfg.modo;
+  $('email').value = cfg.email || '';
+  pintarUrl();
+  $('base').addEventListener('input', (e) => { cfg.base = e.target.value || 'http://localhost:5678'; guardar(); pintarUrl(); });
+  $('modo').addEventListener('change', (e) => { cfg.modo = e.target.value; guardar(); pintarUrl(); });
+
+  document.querySelectorAll('.ideas button').forEach((b) => b.addEventListener('click', () => {
+    $('tema').value = b.textContent;
+    $('aviso').hidden = true;
+    ($('email').value ? $('enviar') : $('email')).focus();
+  }));
+
+  function ocupado(si) {
+    const b = $('enviar');
+    b.disabled = si;
+    b.textContent = '';
+    if (si) { const r = document.createElement('span'); r.className = 'rueda'; b.append(r, 'Buscando titulares y redactando…'); }
+    else b.textContent = 'Redactar post';
+  }
+
+  function error(texto) { $('aviso').textContent = texto; $('aviso').hidden = false; }
+
+  $('form').addEventListener('submit', async (ev) => {
+    ev.preventDefault();
+    $('aviso').hidden = true;
+    const form = ev.target;
+    if (!form.checkValidity()) { form.reportValidity(); return; }
+    const datos = Object.fromEntries(new FormData(form));
+    cfg.email = datos.email; guardar();
+    ocupado(true);
+    try {
+      const res = await fetch(url(), { method: 'POST', body: new URLSearchParams(datos) });
+      let json = null;
+      try { json = await res.json(); } catch (e) {}
+      if (!res.ok || !json || !json.ok || !json.post) {
+        error(res.status >= 500
+          ? 'El flujo de n8n se ha detenido con un error. Abre la ejecución en n8n para ver en qué bloque ha fallado.'
+          : 'n8n ha respondido, pero no como se esperaba (código ' + res.status + '). Revisa que el flujo termina en «Mostrar en la web».');
+        return;
+      }
+      $('texto').textContent = String(json.post).trim();
+      $('enviado').textContent = 'También enviado a ' + (json.enviadoA || datos.email);
+      const lista = $('fuentes');
+      lista.textContent = '';
+      (json.fuentes || []).forEach((f) => {
+        const li = document.createElement('li');
+        const a = document.createElement('a');
+        a.textContent = f.titulo;
+        if (/^https?:\/\//i.test(f.enlace || '')) { a.href = f.enlace; a.target = '_blank'; a.rel = 'noopener noreferrer'; }
+        li.append(a);
+        lista.append(li);
+      });
+      $('bloque-fuentes').hidden = !(json.fuentes || []).length;
+      $('copiar').textContent = 'Copiar post';
+      $('vacio').hidden = true; $('resultado').hidden = false;
+    } catch (e) {
+      error('No se ha podido conectar con n8n en ' + url() + '. Comprueba que n8n está abierto y que el flujo está escuchando: pulsa «Execute workflow» y vuelve a enviar. Si el flujo está publicado, cambia el modo en «Conexión con n8n».');
+      $('ajustes').open = true;
+    } finally {
+      ocupado(false);
+    }
+  });
+
+  $('copiar').addEventListener('click', async () => {
+    const texto = $('texto').textContent;
+    try { await navigator.clipboard.writeText(texto); $('copiar').textContent = 'Copiado'; }
+    catch (e) {
+      const sel = window.getSelection(); const r = document.createRange();
+      r.selectNodeContents($('texto')); sel.removeAllRanges(); sel.addRange(r);
+      $('copiar').textContent = 'Seleccionado: pulsa Ctrl+C';
+    }
+  });
+</script>
+</body>
+</html>
