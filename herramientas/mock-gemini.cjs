@@ -102,21 +102,24 @@ function analista(user) {
   const cuentas = [...new Set(correos.map((c) => c.cuenta))];
   const quien = (de) => String(de || 'Alguien').replace(/<.*>/, '').trim() || 'Alguien';
   const esc = (s) => String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;');
+  void cuentas; void esc;
+  // Devuelve lo que pide el flujo: un apartado, una frase y si merece borrador, por cada número de correo.
   let urgentes = 0;
-  const bloques = cuentas.map((cuenta) => {
-    const suyos = correos.filter((c) => c.cuenta === cuenta && c.asunto !== '(sin correos nuevos)');
-    if (!suyos.length) return `<h3>${esc(cuenta)}</h3>\n<p>Sin novedades</p>`;
-    const grupo = { Urgente: [], 'Pendiente de responder': [], 'Para tu información': [] };
-    for (const c of suyos) {
-      const t = (c.asunto + ' ' + c.extracto).toLowerCase();
-      const k = /hoy|urgente|mañana|antes de las|vence|último día/.test(t) ? 'Urgente' : /\?|confirma|dime|propón|respóndeme|te va bien/.test(t) ? 'Pendiente de responder' : 'Para tu información';
-      if (k === 'Urgente') urgentes++;
-      grupo[k].push(`<li>${esc(quien(c.de))}: ${esc(c.asunto)}.</li>`);
-    }
-    return [`<h3>${esc(cuenta)}</h3>`, ...Object.entries(grupo).filter(([, v]) => v.length).map(([k, v]) => `<p><strong>${k}</strong></p>\n<ul>${v.join('')}</ul>`)].join('\n');
+  const salida = correos.map((c) => {
+    const t = (c.asunto + ' ' + (c.texto || c.extracto || '')).toLowerCase();
+    const apartado = /hoy|urgente|mañana|antes de las|vence|último día/.test(t) ? 'urgente' : /\?|confirma|dime|propón|respóndeme|te va bien/.test(t) ? 'pendiente' : 'info';
+    if (apartado === 'urgente') urgentes++;
+    const automatico = /no-?reply|banco|factura|avisos@/.test(String(c.de).toLowerCase());
+    return { n: c.n, apartado, frase: `${quien(c.de)} escribe sobre «${c.asunto}».`, borrador: apartado !== 'info' && !automatico };
   });
-  const total = correos.filter((c) => c.asunto !== '(sin correos nuevos)').length;
-  return [`<p>Tienes ${total} correos nuevos en ${cuentas.length} cuentas; ${urgentes ? `${urgentes} piden atención hoy` : 'ninguno es urgente'}.</p>`, ...bloques].join('\n');
+  return { resumen: `Tienes ${correos.length} correos nuevos; ${urgentes ? `${urgentes} piden atención hoy` : 'ninguno es urgente'}.`, correos: salida };
+}
+// ── Flujo 3: borradores de respuesta ──
+function borrador(user) {
+  const de = ((user.match(/^De:[ \t]*(.*)$/m) || [])[1] || '').replace(/<.*>/, '').trim();
+  const asunto = ((user.match(/^Asunto:[ \t]*(.*)$/m) || [])[1] || '').trim();
+  const pila = de.split(/\s+/)[0] || '';
+  return `Hola${pila ? ', ' + pila : ''}:\n\nGracias por tu correo sobre «${asunto}». Te contesto en cuanto lo revise. [completar]\n\nUn saludo.`;
 }
 
 function leer(body) {
@@ -173,7 +176,16 @@ function responder(body) {
     return { info: { ...info, flujo: 1, via: 'texto' }, json: deTexto('```json\n' + JSON.stringify(r, null, 2) + '\n```') };
   }
   if (/redactor experto en LinkedIn/.test(sys)) return { info: { ...info, flujo: 2 }, json: deTexto(redactor(user)) };
-  if (/revisa varias cuentas de Gmail/.test(sys)) return { info: { ...info, flujo: 3 }, json: deTexto('```html\n' + analista(user) + '\n```') };
+  if (/revisa varias cuentas de Gmail/.test(sys)) {
+    const r = analista(user);
+    if (salida) {
+      const esquema = salida.parameters || {};
+      const envuelto = !!(esquema.properties && esquema.properties.output);
+      return { info: { ...info, flujo: 3, via: 'herramienta de salida', envuelto }, json: deLlamada(salida.name, envuelto ? { output: r } : r) };
+    }
+    return { info: { ...info, flujo: 3, via: 'texto' }, json: deTexto('```json\n' + JSON.stringify(r, null, 2) + '\n```') };
+  }
+  if (/prepara borradores de respuesta/.test(sys)) return { info: { ...info, flujo: '3-borrador' }, json: deTexto(borrador(user)) };
   return { info: { ...info, flujo: 'desconocido' }, json: deTexto('Soy una IA simulada de pruebas y no reconozco esta petición.') };
 }
 

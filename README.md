@@ -6,7 +6,7 @@ Tres automatizaciones ya hechas para **n8n** (un programa gratuito para conectar
 |---|---|
 | **1 · Recepcionista IA** | Alguien escribe en la web de una academia (inventada) y recibe por correo una respuesta hecha a su medida. Secretaría recibe un aviso con el resumen y la urgencia. |
 | **2 · Redactor de posts** | Escribes un tema, el flujo busca noticias de la última semana y la IA redacta un post para LinkedIn. |
-| **3 · Resumen de varios Gmail** | Cada mañana lee los correos de dos cuentas de Gmail y te manda un único resumen: lo urgente, lo pendiente y lo informativo. |
+| **3 · Resumen de varios Gmail** | Cada mañana lee los correos de tus cuentas de Gmail (dos, y hasta cuatro) y te manda un único resumen: lo urgente, lo pendiente y lo informativo, con un enlace **«Abrir en Gmail»** en cada correo. Para lo que pide respuesta, otra IA deja un **borrador** preparado en la cuenta de la que vino. Nunca envía nada por ti. |
 
 Cada flujo viene en tres versiones:
 
@@ -56,7 +56,14 @@ Ahora mismo **no hay ninguna cuenta conectada**. Los archivos no llevan contrase
 4. En las demás piezas de Gmail, elige esa misma credencial en el desplegable.
 5. Donde ponga `TU_CORREO@gmail.com`, escribe tu correo.
 
-Para el flujo 3 (dos cuentas), repite el paso 2 en **Leer cuenta 2** con la segunda cuenta de Gmail.
+**En el flujo 3 (varias cuentas):**
+- En **Leer cuenta 2**, repite el paso 2 con la segunda cuenta de Gmail.
+- En **Borrador cuenta 1** y **Borrador cuenta 2**, elige la misma cuenta que en Leer cuenta 1 y 2: así cada borrador se guarda en la cuenta de la que vino el correo.
+- En **Cuenta 1** y **Cuenta 2**, pon el nombre de cada cuenta y su dirección de correo (sirve para que «Abrir en Gmail» abra la cuenta correcta).
+- En **Gemini (borradores)**, elige la misma clave de Gemini.
+- **¿Una tercera o cuarta cuenta?** Ya están puestas, apagadas (en gris). Selecciona **Leer cuenta 3**, **Cuenta 3** y **Borrador cuenta 3**, pulsa la tecla **D** para encenderlas y haz lo mismo que con las otras.
+
+Los borradores aparecen en la carpeta **Borradores** de cada cuenta, dentro de la conversación del correo. Como mucho se preparan 5 al día, y nunca para avisos automáticos, facturas o boletines. **Revísalos antes de enviarlos.**
 
 > Consejo: haz la primera prueba con una cuenta de Gmail de pruebas, no con la personal.
 

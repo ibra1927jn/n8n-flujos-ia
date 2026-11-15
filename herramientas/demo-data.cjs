@@ -2,6 +2,8 @@
 // Solo se usan en la copia «demo simulada»; los archivos que se entregan no llevan datos fijados.
 const L = (...lines) => lines.join('\n');
 const enviado = (n) => [{ id: `demo-simulado-${n}`, threadId: `demo-simulado-${n}`, labelIds: ['SENT'] }];
+// Lo que devuelve Gmail al guardar un borrador.
+const guardado = (desde, cuantos) => Array.from({ length: cuantos }, (_, i) => ({ id: `demo-borrador-${desde + i}`, message: { id: `demo-borrador-mensaje-${desde + i}`, labelIds: ['DRAFT'] } }));
 const correo = (n, From, Subject, snippet) => ({ id: `demo-${n}`, threadId: `demo-${n}`, snippet, From, To: 'yo@example.com', Subject });
 
 module.exports = {
@@ -61,7 +63,7 @@ module.exports = {
   },
 
   '3-resumen-varios-gmail': {
-    nota: 'Para probarlo: pulsa **Execute workflow**. Los correos de las dos cuentas son inventados y el resumen es el ejemplo fijado.',
+    nota: 'Para probarlo: pulsa **Execute workflow**. Los correos de las dos cuentas son inventados; el resumen y los cuatro borradores son los ejemplos fijados. No se guarda ningún borrador de verdad.',
     pin: {
       gmail1: [
         correo('p1', 'Marta Ruiz <marta.ruiz@example.com>', 'Entrega del trabajo final: mañana a las 12:00', 'Hola, te recuerdo que la entrega del trabajo final del curso es mañana antes de las 12:00. Súbelo al campus en PDF.'),
@@ -75,26 +77,29 @@ module.exports = {
       ],
       agente: [
         {
-          output: L(
-            '<p>Hoy hay dos cosas con plazo: Javier necesita el informe de ventas antes de las 17:00 y mañana a las 12:00 vence la entrega del trabajo final.</p>',
-            '<h3>Personal</h3>',
-            '<p><strong>Urgente</strong></p>',
-            '<ul><li>Marta Ruiz recuerda que la entrega del trabajo final es mañana antes de las 12:00, en PDF y por el campus.</li></ul>',
-            '<p><strong>Pendiente de responder</strong></p>',
-            '<ul><li>La administración de fincas convoca junta de vecinos el jueves 19 a las 19:30 y pide confirmar asistencia.</li></ul>',
-            '<p><strong>Para tu información</strong></p>',
-            '<ul><li>Luz Ejemplo avisa de que la factura de noviembre (48,20 €) se cargará el día 20.</li></ul>',
-            '<h3>Trabajo</h3>',
-            '<p><strong>Urgente</strong></p>',
-            '<ul><li>Javier Soto pide el informe de ventas de octubre hoy antes de las 17:00, porque el cliente ha adelantado la reunión.</li></ul>',
-            '<p><strong>Pendiente de responder</strong></p>',
-            '<ul><li>Laura Peña propone reunirse el viernes a las 10:00 para revisar el calendario del proyecto.</li></ul>',
-            '<p><strong>Para tu información</strong></p>',
-            '<ul><li>Recursos Humanos ha publicado en la intranet el calendario laboral de 2027.</li></ul>',
-          ),
+          output: {
+            resumen: 'Hoy hay dos cosas con plazo: Javier necesita el informe de ventas antes de las 17:00 y mañana a las 12:00 vence la entrega del trabajo final.',
+            correos: [
+              { n: 1, apartado: 'urgente', frase: 'Marta Ruiz recuerda que la entrega del trabajo final es mañana antes de las 12:00, en PDF y por el campus.', borrador: true },
+              { n: 2, apartado: 'pendiente', frase: 'La administración de fincas convoca junta de vecinos el jueves 19 a las 19:30 y pide confirmar asistencia.', borrador: true },
+              { n: 3, apartado: 'info', frase: 'Luz Ejemplo avisa de que la factura de noviembre (48,20 €) se cargará el día 20.', borrador: false },
+              { n: 4, apartado: 'urgente', frase: 'Javier Soto pide el informe de ventas de octubre hoy antes de las 17:00, porque el cliente ha adelantado la reunión.', borrador: true },
+              { n: 5, apartado: 'pendiente', frase: 'Laura Peña propone reunirse el viernes a las 10:00 para revisar el calendario del proyecto.', borrador: true },
+              { n: 6, apartado: 'info', frase: 'Recursos Humanos ha publicado en la intranet el calendario laboral de 2027.', borrador: false },
+            ],
+          },
         },
       ],
+      // Un texto por cada borrador, en el orden en que los elige el flujo (correos 1, 2, 4 y 5).
+      redactor: [
+        { output: 'Hola, Marta:\n\nGracias por el recordatorio. Subiré el trabajo final en PDF al campus antes de mañana a las 12:00.\n\nUn saludo.' },
+        { output: 'Hola:\n\nGracias por la convocatoria. Os confirmo que [asistiré / no podré asistir] a la junta del jueves 19 a las 19:30.\n\nUn saludo.' },
+        { output: 'Hola, Javier:\n\nEntendido. Te envío el informe de ventas de octubre hoy antes de las 17:00 para que lo tengas para la reunión.\n\nUn saludo.' },
+        { output: 'Hola, Laura:\n\nEl viernes a las 10:00 me va bien para revisar el calendario del proyecto. [Si prefieres otra hora, dímelo.]\n\nUn saludo.' },
+      ],
       enviar: enviado(4),
+      borrador1: guardado(1, 2),
+      borrador2: guardado(3, 2),
     },
   },
 };

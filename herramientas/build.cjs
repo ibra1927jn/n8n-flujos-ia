@@ -212,6 +212,20 @@ function montaje(flow, idx, data) {
   return { ...w, name: `${flow.name} (montaje de prueba)`, connections: {}, id: 'mont' + String(idx + 1).padStart(12, '0') };
 }
 
+// Lo que apuntan los sustitutos de los bloques de Gmail que envían o guardan: destinatario, asunto, cuerpo y, en los
+// borradores, el hilo. Así se comprueba lo que saldría sin enviar ni guardar nada.
+const capturaGmail = (n) => {
+  const p = n.parameters;
+  const campos = [['sendTo', p.sendTo || (p.options && p.options.sendTo) || '', 'string'], ['subject', p.subject, 'string'], ['message', p.message, 'string']];
+  if (p.resource === 'draft') campos.push(['borrador', true, 'boolean'], ['threadId', (p.options && p.options.threadId) || '', 'string']);
+  return campos;
+};
+// Los sustitutos de un bloque apagado también van apagados, para que el flujo de prueba se comporte igual.
+const apagar = (flow, nodes) => {
+  const apagados = new Set(flow.nodes.filter((n) => n.extra && n.extra.disabled).map((n) => n.name));
+  for (const j of nodes) if (apagados.has(j.name)) j.disabled = true;
+};
+
 // ── simulacro: mismas expresiones, sin credenciales ──
 function simulacro(flow, idx) {
   const v = 'prueba';
@@ -251,7 +265,7 @@ function simulacro(flow, idx) {
         alwaysOutputData: true,
       });
     } else if (n.t === 'gmail') {
-      nodes.push(setNode(n, [['sendTo', n.parameters.sendTo, 'string'], ['subject', n.parameters.subject, 'string'], ['message', n.parameters.message, 'string']]));
+      nodes.push(setNode(n, capturaGmail(n)));
     } else if (n.t === 'schedule') {
       nodes.push({
         parameters: { path: `prueba-${flow.key}`, responseMode: 'lastNode', options: {} },
@@ -270,6 +284,7 @@ function simulacro(flow, idx) {
       nodes.push(nodeJson(flow, v, n));
     }
   }
+  apagar(flow, nodes);
   const links = flow.links.filter((l) => !l.type || l.type === 'main');
   return wrap(flow, `[PRUEBA] ${flow.name}`, nodes, connectionsJson(flow, links), { id: `prueba0000000000${idx + 1}`.slice(-16), active: false });
 }
@@ -298,7 +313,7 @@ function puente(flow, idx) {
         id: uid(`${flow.key}/${v}/${n.key}`), name: n.name, type: T.code[0], typeVersion: T.code[1], position: n.pos, alwaysOutputData: true,
       });
     } else if (n.t === 'gmail') {
-      nodes.push(captura(n, [['sendTo', n.parameters.sendTo, 'string'], ['subject', n.parameters.subject, 'string'], ['message', n.parameters.message, 'string']]));
+      nodes.push(captura(n, capturaGmail(n)));
     } else if (n.t === 'schedule') {
       nodes.push({
         parameters: { httpMethod: 'POST', path: `puente-${flow.key}`, responseMode: 'lastNode', options: {} },
@@ -313,6 +328,7 @@ function puente(flow, idx) {
       nodes.push(nodeJson(flow, v, n));
     }
   }
+  apagar(flow, nodes);
   return wrap(flow, `${flow.name} (Claude en lugar de Gemini)`, nodes, connectionsJson(flow, flow.links), { id: 'puente' + String(idx + 1).padStart(10, '0'), active: false });
 }
 

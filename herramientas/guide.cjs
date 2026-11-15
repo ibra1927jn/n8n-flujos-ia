@@ -10,7 +10,7 @@ const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replac
 const md = (s) => esc(s).replace(/\*\*(.+?)\*\*/g, '<b>$1</b>').replace(/\*(.+?)\*/g, '<i>$1</i>').replace(/`(.+?)`/g, '<code>$1</code>');
 
 // ───────────── diagrama SVG ─────────────
-const CLASE = { webhook: 'k-inicio', schedule: 'k-inicio', agent: 'k-ia', gemini: 'k-ia', parser: 'k-ia', gmail: 'k-gmail', http: 'k-http', xml: 'k-datos', set: 'k-datos', merge: 'k-datos', aggregate: 'k-datos', respond: 'k-fin' };
+const CLASE = { webhook: 'k-inicio', schedule: 'k-inicio', agent: 'k-ia', gemini: 'k-ia', parser: 'k-ia', gmail: 'k-gmail', http: 'k-http', xml: 'k-datos', set: 'k-datos', merge: 'k-datos', aggregate: 'k-datos', code: 'k-datos', switch: 'k-datos', respond: 'k-fin' };
 const MARCO = { 4: 'm-verde', 5: 'm-azul', 6: 'm-morado', 7: 'm-gris' };
 
 function icono(t, cx, cy) {
@@ -34,6 +34,10 @@ function icono(t, cx, cy) {
       return `<g ${S}><path d="M${cx - 18} ${cy - 10} H${cx + 18} M${cx - 18} ${cy + 10} H${cx + 18}"/><circle cx="${cx - 6}" cy="${cy - 10}" r="5" fill="var(--nodo)"/><circle cx="${cx + 8}" cy="${cy + 10}" r="5" fill="var(--nodo)"/></g>`;
     case 'merge':
       return `<g ${S}><path d="M${cx - 18} ${cy - 14} C${cx - 2} ${cy - 14} ${cx - 6} ${cy} ${cx + 6} ${cy} M${cx - 18} ${cy + 14} C${cx - 2} ${cy + 14} ${cx - 6} ${cy} ${cx + 6} ${cy} H${cx + 18}"/></g>`;
+    case 'code':
+      return `<g ${S}><path d="M${cx - 8} ${cy - 12} L${cx - 20} ${cy} L${cx - 8} ${cy + 12} M${cx + 8} ${cy - 12} L${cx + 20} ${cy} L${cx + 8} ${cy + 12} M${cx + 4} ${cy - 16} L${cx - 4} ${cy + 16}"/></g>`;
+    case 'switch':
+      return `<g ${S}><path d="M${cx - 18} ${cy} H${cx - 4} M${cx - 4} ${cy} L${cx + 16} ${cy - 14} M${cx - 4} ${cy} H${cx + 16} M${cx - 4} ${cy} L${cx + 16} ${cy + 14}"/></g>`;
     case 'aggregate':
       return `<g ${S}><path d="M${cx - 9} ${cy - 12} H${cx + 18} M${cx - 9} ${cy} H${cx + 18} M${cx - 9} ${cy + 12} H${cx + 18}"/><circle cx="${cx - 17}" cy="${cy - 12}" r="1.8" fill="currentColor"/><circle cx="${cx - 17}" cy="${cy}" r="1.8" fill="currentColor"/><circle cx="${cx - 17}" cy="${cy + 12}" r="1.8" fill="currentColor"/></g>`;
     case 'schedule':
@@ -164,25 +168,41 @@ const EXPLICA = {
     },
   },
   '3-resumen-varios-gmail': {
-    resumen: 'Lee los correos recibidos en las últimas 24 horas en dos cuentas de Gmail. La IA separa lo urgente, lo pendiente y lo informativo de cada una, y te llega un único correo con el resumen.',
+    resumen: 'Lee los correos de las últimas 24 horas de varias cuentas de Gmail (dos encendidas y hasta cuatro). La IA separa lo urgente, lo pendiente y lo informativo, y te llega un único correo con un enlace «Abrir en Gmail» en cada punto. Para lo que pide respuesta, otra IA deja un borrador en la cuenta de la que vino el correo: nunca envía nada.',
     web: null,
     probar: [
       'Abre el flujo y pulsa <b>Execute workflow</b>. No hace falta esperar a las 8:00: el botón lo lanza en el momento.',
-      'Las dos cuentas se leen a la vez, se unen y pasan por la IA.',
-      'Mira tu bandeja: tienes un correo «Resumen de tus correos» con una sección por cuenta.',
+      'Las cuentas se leen a la vez, se unen y pasan por la IA, que clasifica cada correo.',
+      'Mira tu bandeja: tienes un correo «Resumen de tus correos» con una sección por cuenta y un enlace a cada correo.',
+      'Abre la carpeta <b>Borradores</b> de cada cuenta: están las respuestas preparadas, dentro del hilo de cada correo. Revísalas y envíalas tú.',
     ],
-    truco: 'Antes de la clase, envíate un par de correos a cada cuenta (uno que suene urgente) para que el resumen tenga chicha.',
+    truco: 'Antes de la clase, envíate un par de correos a cada cuenta, uno con una pregunta («¿te va bien el viernes?»), para que el resumen tenga chicha y salga algún borrador.',
     bloques: {
       schedule: 'Disparador por horario: todos los días a las 8:00, en la zona horaria que tenga puesta el flujo. En directo se lanza con Execute workflow.',
       gmail1: 'Trae los correos recibidos en las últimas 24 horas en la primera cuenta, sin promociones, redes sociales ni lo que has enviado tú.',
-      etiqueta1: 'Apunta de qué cuenta viene cada correo y se queda con el remitente, el asunto y el extracto.',
+      cuenta1: 'Apunta de qué cuenta viene cada correo (nombre y dirección) y se queda con el remitente, el asunto, el texto y el hilo.',
       gmail2: 'Lo mismo, con la segunda cuenta.',
-      etiqueta2: 'Lo mismo, con el nombre de la segunda cuenta.',
-      merge: 'Junta las dos ramas en una sola.',
-      lista: 'Convierte todos los correos en una única lista, para dársela a la IA de una vez.',
-      agente: 'El agente de IA. Separa por cuenta lo urgente, lo pendiente y lo informativo.',
+      cuenta2: 'Lo mismo, con el nombre y la dirección de la segunda cuenta.',
+      gmail3: 'Tercera cuenta. Viene apagada: se enciende seleccionando sus tres bloques y pulsando D.',
+      cuenta3: 'Nombre y dirección de la tercera cuenta (apagado hasta que la uses).',
+      gmail4: 'Cuarta cuenta, igual que la tercera.',
+      cuenta4: 'Nombre y dirección de la cuarta cuenta (apagado hasta que la uses).',
+      merge: 'Junta las cuatro ramas en una sola. Lo que llega de una cuenta apagada se descarta en el bloque siguiente.',
+      lista: 'Numera los correos y prepara el enlace «Abrir en Gmail» de cada uno. El enlace lo monta el flujo, no la IA, así que no puede inventarlo.',
+      agente: 'El agente de IA. Clasifica cada correo como urgente, pendiente o informativo, lo resume en una frase y decide si merece una respuesta.',
       gemini: 'El modelo de lenguaje que piensa por el agente.',
+      parser: 'Obliga a la IA a contestar con un apartado, una frase y un sí o un no por cada número de correo.',
+      montar: 'Monta el correo del resumen: una sección por cuenta, los apartados y un enlace por correo. Si la IA se salta un correo, sale con su asunto, para que no se pierda ninguno.',
       enviar: 'Te manda un único correo con el resumen.',
+      elegir: 'Elige los correos que merecen borrador: solo lo urgente o pendiente que ha escrito una persona, nunca avisos automáticos, y como mucho cinco.',
+      redactor: 'Segundo agente de IA. Escribe una respuesta corta para cada correo elegido. Si le falta un dato, deja un hueco entre corchetes.',
+      gemini2: 'El modelo de lenguaje del segundo agente.',
+      juntar: 'Junta cada respuesta con su correo: a quién va, el asunto y el hilo.',
+      reparto: 'Manda cada borrador por la salida de su cuenta, para guardarlo con la credencial de esa cuenta.',
+      borrador1: 'Guarda el borrador en la carpeta Borradores de la primera cuenta, dentro del hilo del correo. No lo envía.',
+      borrador2: 'Lo mismo, en la segunda cuenta.',
+      borrador3: 'Lo mismo, en la tercera cuenta (apagado hasta que la uses).',
+      borrador4: 'Lo mismo, en la cuarta cuenta (apagado hasta que la uses).',
     },
   },
 };
@@ -356,13 +376,15 @@ const html = `<!doctype html>
 
   <h3><span class="num">2</span>Elige las credenciales</h3>
   <p>Los archivos no llevan contraseñas ni claves. Al importar, los bloques de Gemini y de Gmail aparecen con un aviso hasta que eliges tu credencial: abre el bloque y selecciónala en el desplegable de credencial, arriba del todo.</p>
-  <div class="caja aviso"><b>Si n8n las elige solo.</b> Las versiones recientes, al importar, ponen ellas mismas una credencial que ya tengas y avisan con el mensaje «Credentials auto-added». Revísalo bloque a bloque: en el flujo 3 puede poner la misma cuenta de Gmail en <b>Leer cuenta 1</b> y en <b>Leer cuenta 2</b>, y la segunda hay que cambiarla a mano.</div>
+  <div class="caja aviso"><b>Si n8n las elige solo.</b> Las versiones recientes, al importar, ponen ellas mismas una credencial que ya tengas y avisan con el mensaje «Credentials auto-added». Revísalo bloque a bloque: en el flujo 3 puede poner la misma cuenta de Gmail en <b>Leer cuenta 1</b> y en <b>Leer cuenta 2</b>, o en los bloques de borrador, y la segunda hay que cambiarla a mano.</div>
   <div class="tabla"><table>
     <thead><tr><th>Bloque</th><th>Qué elegir</th></tr></thead>
     <tbody>
       <tr><td><b>Gemini</b> (los tres flujos)</td><td>Tu credencial de Google Gemini, la misma de clase. En <b>Model</b> viene <code>gemini-flash-latest</code>, un nombre que apunta siempre al modelo Flash más reciente de Google, así que no caduca. Si en clase usáis otro, elígelo en la lista.</td></tr>
       <tr><td><b>Responder al alumno</b>, <b>Avisar a secretaría</b>, <b>Enviar el post</b>, <b>Enviar resumen</b></td><td>Tu cuenta de Gmail.</td></tr>
       <tr><td><b>Leer cuenta 1</b> y <b>Leer cuenta 2</b> (flujo 3)</td><td>Una cuenta de Gmail distinta en cada uno.</td></tr>
+      <tr><td><b>Borrador cuenta 1</b> y <b>Borrador cuenta 2</b> (flujo 3)</td><td>La misma cuenta que en <b>Leer cuenta 1</b> y <b>Leer cuenta 2</b>: el borrador se guarda en la cuenta de la que vino el correo.</td></tr>
+      <tr><td><b>Gemini (borradores)</b> (flujo 3)</td><td>La misma credencial de Gemini.</td></tr>
     </tbody>
   </table></div>
   <div class="caja info"><b>Segunda cuenta de Gmail.</b> En el bloque <b>Leer cuenta 2</b>, elige <b>Create new credential</b>, pega el mismo Client ID y Client Secret que usaste para la primera e inicia sesión con la otra cuenta. Si Google responde que el acceso está bloqueado, entra en Google Cloud, abre <b>Google Auth Platform</b> → <b>Audience</b> (Público) y añade esa dirección en <b>Test users</b> (Usuarios de prueba).</div>
@@ -371,7 +393,7 @@ const html = `<!doctype html>
   <ul>
     <li>Flujo 1, bloque <b>Avisar a secretaría</b>: cambia <code>${MI_CORREO}</code> por tu correo en el campo <b>To</b>.</li>
     <li>Flujo 3, bloque <b>Enviar resumen</b>: lo mismo.</li>
-    <li>Flujo 3, bloques <b>Etiquetar cuenta 1</b> y <b>Etiquetar cuenta 2</b>: cambia «Personal» y «Trabajo» por el nombre que quieras dar a cada cuenta.</li>
+    <li>Flujo 3, bloques <b>Cuenta 1</b> y <b>Cuenta 2</b>: cambia «Personal» y «Trabajo» por el nombre que quieras dar a cada cuenta y escribe su dirección en <b>correo_de_la_cuenta</b>. Con ella, «Abrir en Gmail» abre la cuenta correcta aunque tengas varias abiertas en el navegador.</li>
     <li>Flujo 3, hora del resumen: n8n no conserva la zona horaria al importar un flujo, así que las 8:00 serían las de la zona que tenga tu n8n por defecto (si nunca la has cambiado, la de Nueva York). Abre el menú de los tres puntos → <b>Settings</b>, elige la tuya en <b>Timezone</b> (en la península, <code>Europe/Madrid</code>) y pulsa <b>Save</b>.</li>
   </ul>
   <div class="caja aviso"><b>Hazlo en las dos versiones.</b> La versión terminada y la versión para montar son flujos distintos, así que las credenciales y tu correo hay que ponerlos en ambas. Cada flujo lleva una nota amarilla con estos mismos pasos.</div>
@@ -407,7 +429,8 @@ const html = `<!doctype html>
   <ul>
     <li><b>Unión normal:</b> arrastra desde el punto del lado derecho de un bloque hasta el lado izquierdo del siguiente.</li>
     <li><b>Modelo y formato del agente:</b> los bloques redondos (Gemini y Formato de salida) se unen por arriba. Arrastra desde su rombo superior hasta la entrada del agente que lleva su nombre: <i>Chat Model</i> o <i>Output Parser</i>.</li>
-    <li><b>Unir cuentas</b> tiene dos entradas a la izquierda: una para cada cuenta.</li>
+    <li><b>Unir cuentas</b> tiene cuatro entradas a la izquierda: una para cada cuenta.</li>
+    <li><b>¿De qué cuenta?</b> tiene cuatro salidas a la derecha: la primera va a <b>Borrador cuenta 1</b>, la segunda a <b>Borrador cuenta 2</b> y así.</li>
     <li>Al terminar, pulsa <b>Execute workflow</b> y haz la prueba igual que en el apartado 3.</li>
   </ul>
   <div class="caja aviso"><b>Ensaya en una copia.</b> Las versiones recientes de n8n guardan los cambios solas. Si unes los bloques mientras ensayas, la versión «para montar» se queda unida y el día de la clase ya no habrá nada que montar. Antes de ensayar, abre el menú de los tres puntos y elige <b>Duplicate</b>: ensaya en el duplicado y deja el original sin tocar. Si ya lo has unido, importa otra vez el archivo «para montar».</div>
@@ -446,6 +469,8 @@ const html = `<!doctype html>
       <tr><td>El bloque Gemini se pone en rojo.</td><td>Revisa la credencial. Si el mensaje dice que el modelo no existe o no está disponible, elige otro en la lista <b>Model</b>. Si habla de cuota o de límite, espera un minuto y repite. Para no parar la clase, sigue con la copia de ensayo sin conexión.</td></tr>
       <tr><td>En el flujo 1, la web dice que has recibido una respuesta automática.</td><td>La IA ha fallado tres veces seguidas y ha entrado la respuesta de reserva. El flujo termina bien, pero en el lienzo el bloque <b>Gemini</b> queda en rojo. El motivo está en el aviso a secretaría y en la salida del bloque <b>Recepcionista IA</b>, en el campo <code>error</code>. Lo habitual es la credencial, el modelo o el límite de peticiones de Gemini.</td></tr>
       <tr><td>El post sale sin titulares.</td><td>Google Noticias no ha encontrado nada de la última semana para ese tema, o no ha contestado a tiempo. El post se escribe igualmente; prueba con un tema más general.</td></tr>
+      <tr><td>No aparece ningún borrador.</td><td>Solo se preparan para lo urgente o pendiente que ha escrito una persona; los avisos automáticos, facturas y boletines no llevan. Mira también que <b>Borrador cuenta 1</b> y <b>2</b> tengan su cuenta elegida.</td></tr>
+      <tr><td>Un borrador sale en otra cuenta.</td><td>En <b>Borrador cuenta</b> N tiene que estar la misma cuenta de Gmail que en <b>Leer cuenta</b> N.</td></tr>
       <tr><td>El resumen dice «Sin novedades».</td><td>Esa cuenta no ha recibido correos en las últimas 24 horas. Envíate alguno desde otra cuenta o, en <b>Leer cuenta</b>, cambia <code>newer_than:1d</code> por <code>newer_than:3d</code> en el campo <b>Search</b>.</td></tr>
       <tr><td>El resumen no llega a las 8:00.</td><td>El disparador por horario solo funciona con el flujo publicado (botón <b>Publish</b>) y con n8n abierto a esa hora. Si llega a otra hora, falta poner la zona horaria: menú de los tres puntos → <b>Settings</b> → <b>Timezone</b>.</td></tr>
       <tr><td>Al publicar, n8n avisa de un conflicto de webhook.</td><td>Las dos versiones del flujo usan la misma dirección. Publica solo una.</td></tr>
@@ -461,7 +486,7 @@ const html = `<!doctype html>
     <li><b>Que te avise cuando un flujo falle:</b> crea un flujo nuevo con el disparador <b>Error Trigger</b> seguido de un bloque de Gmail, y elígelo en el menú de los tres puntos → <b>Settings</b> → <b>Error Workflow</b> de cada flujo. Es la forma habitual de enterarse de los fallos en flujos que funcionan solos, como el 3.</li>
     <li><b>Otra academia u otro negocio:</b> en el flujo 1, abre <b>Recepcionista IA</b> y cambia el texto de <b>System Message</b>: ahí están los cursos, los precios y los horarios. Para que la web coincida, cambia también los textos de <code>web/contacto-academia.html</code>.</li>
     <li><b>Otra red social:</b> en el flujo 2, abre <b>Redactor IA</b> y adapta las instrucciones de <b>System Message</b> (longitud, estructura, hashtags).</li>
-    <li><b>Una tercera cuenta de Gmail:</b> en el flujo 3, duplica <b>Leer cuenta 2</b> y <b>Etiquetar cuenta 2</b>, elige la nueva credencial, abre <b>Unir cuentas</b> y sube <b>Number of Inputs</b> a 3. Une la nueva rama a la tercera entrada.</li>
+    <li><b>Una tercera o cuarta cuenta de Gmail:</b> en el flujo 3 ya están puestas y apagadas (se ven en gris). Selecciona <b>Leer cuenta 3</b>, <b>Cuenta 3</b> y <b>Borrador cuenta 3</b>, pulsa la tecla <b>D</b> para encenderlos, elige la cuenta de Gmail en el primero y el último, y pon su nombre y su dirección en el del medio.</li>
     <li><b>Solo correos sin leer:</b> en <b>Leer cuenta</b>, añade <code>is:unread</code> al campo <b>Search</b>. Funciona igual que el buscador de Gmail.</li>
   </ul>
 </section>

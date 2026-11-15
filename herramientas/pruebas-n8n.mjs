@@ -171,13 +171,17 @@ try {
       ok('el flujo termina', r.status === 200, `estado ${r.status} ${r.texto.slice(0, 120)}`);
       await sleep(1500);
       const e = await ultimaEjecucion(S3);
-      const correos = e?.salida?.['Hacer una lista']?.items?.[0]?.correos || [];
+      const lista = e?.salida?.['Preparar la lista']?.items?.[0] || {};
+      const correos = lista.correos || [];
       const asuntos = correos.map((c) => `${c.cuenta}: ${c.asunto}`);
+      const enviado = e?.salida?.['Enviar resumen']?.items?.[0] || {};
       ok('lee el asunto aunque la cabecera venga en minúsculas', asuntos.includes('Personal: Tu recibo de la luz está disponible'), asuntos.join(' | '));
       ok('distingue un correo sin asunto', asuntos.includes('Personal: (sin asunto)'));
-      ok('marca la cuenta sin correos', asuntos.includes('Trabajo: (sin correos nuevos)'));
+      ok('la cuenta sin correos sigue en la lista, sin correos', (lista.cuentas || []).includes('Trabajo') && !correos.some((c) => c.cuenta === 'Trabajo'), JSON.stringify(lista.cuentas));
+      ok('las cuentas 3 y 4, apagadas, no aparecen', JSON.stringify(lista.cuentas) === '["Personal","Trabajo"]', JSON.stringify(lista.cuentas));
+      ok('cada correo lleva su enlace a Gmail', correos.length > 0 && correos.every((c) => c.enlace.endsWith('#all/' + c.id)), correos[0]?.enlace);
       ok('lee el remitente aunque venga en minúsculas', correos.some((c) => c.de === 'Banco Ejemplo <avisos@banco.example>'));
-      ok('asunto del resumen con la fecha en español', /^Resumen de tus correos · (lunes|martes|miércoles|jueves|viernes|sábado|domingo) \d+ de [a-z]+$/.test(r.json?.subject || ''), r.json?.subject);
+      ok('asunto del resumen con la fecha en español', /^Resumen de tus correos · (lunes|martes|miércoles|jueves|viernes|sábado|domingo) \d+ de [a-z]+$/.test(enviado.subject || ''), enviado.subject);
     });
     await bloque('Resumen de Gmail · ajustes de los archivos que se entregan', async () => {
       for (const variante of ['terminado', 'para-montar', 'ensayo']) {
@@ -261,9 +265,10 @@ try {
       await n.esperar(`!document.title.startsWith('🔄')`, 30000).catch(() => {});
       await sleep(1500); await encajar(n); await n.foto('ia-3-lienzo.png');
       const e = await ultimaEjecucion(M3);
-      const html = e?.salida?.['Analista IA']?.items?.[0]?.output || '';
+      const html = e?.salida?.['Montar el resumen']?.items?.[0]?.html || '';
       ok('la ejecución termina bien', e?.status === 'success', `${e?.status} ${e?.error || ''}`);
-      ok('el resumen trae una sección por cuenta', /<h3>Personal<\/h3>/.test(html) && /<h3>Trabajo<\/h3>/.test(html), html.replace(/\s+/g, ' ').slice(0, 140));
+      ok('el resumen trae una sección por cuenta', /<h3[^>]*>Personal<\/h3>/.test(html) && /<h3[^>]*>Trabajo<\/h3>/.test(html), html.replace(/\s+/g, ' ').slice(0, 140));
+      ok('cada correo lleva «Abrir en Gmail»', /Abrir en Gmail/.test(html));
       ok('separa lo urgente', /<strong>Urgente<\/strong>/.test(html));
     });
     await bloque('Lo que n8n le envía de verdad a la IA', async () => {

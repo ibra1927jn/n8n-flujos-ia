@@ -29,7 +29,11 @@ Los archivos de `flujos/` no llevan credenciales ni claves: se eligen en n8n des
 
 - **Comprobado** en n8n 2.42.6, con una IA simulada en local: importar desde el menú, montar las tres versiones «para montar» arrastrando las uniones, ejecutar los tres flujos y los casos de fallo (la IA responde mal, la IA no responde, las noticias no llegan). La batería son 113 comprobaciones.
 - **Comprobado** también con respuestas de una IA real en los flujos 1 y 2: el agente de n8n recibió las respuestas de Claude en lugar de las de Gemini. De ahí salen los correos de `ejemplos/`.
-- **Sin comprobar:** Gemini y Gmail de verdad, porque dependen de las credenciales de quien lo use.
+- **Comprobado** (15 de noviembre de 2026), para la versión del flujo 3 con enlaces, borradores y cuatro cuentas:
+  - En n8n 2.42.6, de principio a fin, con los dos agentes contra la IA simulada y Gmail sustituido por la copia «puente». Se probaron tres casos con 20 comprobaciones: correos variados (uno con instrucciones trampa para la IA), cuentas vacías y más de cinco correos que piden respuesta.
+  - En el editor, la versión de ensayo se ejecuta con un clic aunque las cuentas 3 y 4 estén apagadas y sin credencial.
+  - La batería `pruebas-n8n.mjs` se ha adaptado a este flujo, pero no se ha vuelto a ejecutar entera.
+- **Sin comprobar:** Gemini y Gmail de verdad, porque dependen de las credenciales de quien lo use. En particular, que el enlace `#all/<id>` abra el correo y que el borrador quede dentro del hilo en una cuenta real.
 
 ## Cómo se generan los flujos
 
