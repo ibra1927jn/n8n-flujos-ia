@@ -6,3 +6,6 @@ herramientas/edge-perfil/
 herramientas/zip-comprobado-*/
 _revision/
 *.zip
+
+# datos de n8n creados por ABRIR-N8N.bat
+datos-n8n/
